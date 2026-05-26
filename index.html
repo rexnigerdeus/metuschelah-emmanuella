@@ -987,7 +987,7 @@
 
   // RSVP SUBMIT
   // ⚠️  Remplacer l'URL ci-dessous par votre URL Google Apps Script après déploiement
-  const APPS_SCRIPT_URL = 'HTTPS://SCRIPT.GOOGLE.COM/MACROS/S/AKFYCBWMDMJTR2HV-WCKDDC1HGOFBGMNB8NIWBQ5II3BHJWKFW-LBZPYKXL326A-NVCHKQMX/EXEC';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec';
 
   function submitRSVP() {
     const prenom = document.getElementById('rsvp-prenom').value.trim();
@@ -1006,7 +1006,7 @@
 
     const payload = { prenom, nom, telephone: tel, affiliation };
 
-    if (APPS_SCRIPT_URL === 'HTTPS://SCRIPT.GOOGLE.COM/MACROS/S/AKFYCBWMDMJTR2HV-WCKDDC1HGOFBGMNB8NIWBQ5II3BHJWKFW-LBZPYKXL326A-NVCHKQMX/EXEC') {
+    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec') {
       // Mode démo (sans backend configuré)
       setTimeout(() => {
         document.getElementById('rsvpForm').style.display = 'none';
@@ -1017,16 +1017,20 @@
 
     fetch(APPS_SCRIPT_URL, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
+      mode: 'no-cors', // Évite le blocage CORS
+      headers: { 
+        'Content-Type': 'text/plain;charset=utf-8' // Astuce : utiliser text/plain au lieu de application/json
+      },
       body: JSON.stringify(payload)
     }).then(() => {
+      // Le mode no-cors ne renvoie pas de réponse lisible, on assume le succès
       document.getElementById('rsvpForm').style.display = 'none';
       document.getElementById('rsvpSuccess').style.display = 'block';
-    }).catch(() => {
-      // Afficher succès quand même (no-cors ne permet pas de lire la réponse)
-      document.getElementById('rsvpForm').style.display = 'none';
-      document.getElementById('rsvpSuccess').style.display = 'block';
+    }).catch((err) => {
+      console.error(err);
+      alert("Une erreur est survenue lors de l'envoi. Veuillez réessayer.");
+      btn.disabled = false;
+      btn.textContent = 'Confirmer ma présence';
     });
   }
 

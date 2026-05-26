@@ -322,7 +322,7 @@
 
 <script>
   // ⚠️  Remplacer par votre URL Google Apps Script après déploiement
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec';
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec';
   const ADMIN_PWD = 'ME2026';
 
   let guestData = [];
@@ -332,7 +332,7 @@
     if (pwd === ADMIN_PWD) {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
-      if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec') {
+      if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec') {
         document.getElementById('configWarning').style.display = 'block';
         showDemo();
       } else {
@@ -350,7 +350,7 @@
   }
 
   function loadGuests() {
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec') { showDemo(); return; }
+    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec') { showDemo(); return; }
     document.getElementById('tableContent').innerHTML = '<div class="loading">Chargement…</div>';
 
     const cbName = 'rsvpCb_' + Date.now();
