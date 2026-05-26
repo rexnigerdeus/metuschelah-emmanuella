@@ -877,14 +877,6 @@
 </section>
 
 
-<!-- QR CODE -->
-<div class="qr-section fade-in">
-  <span class="label">✦ Partager l'invitation ✦</span>
-  <div class="qr-img-wrap">
-    <img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=https://metuschelah-emmanuella.vercel.app/&color=0F0F0F&bgcolor=FFFFFF&margin=8" alt="QR Code invitation">
-  </div>
-  <p>metuschelah-emmanuella.vercel.app</p>
-</div>
 
 <!-- RSVP -->
 <div class="rsvp-section fade-in" id="rsvp">
@@ -995,7 +987,7 @@
 
   // RSVP SUBMIT
   // ⚠️  Remplacer l'URL ci-dessous par votre URL Google Apps Script après déploiement
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec';
+  const APPS_SCRIPT_URL = 'HTTPS://SCRIPT.GOOGLE.COM/MACROS/S/AKFYCBWMDMJTR2HV-WCKDDC1HGOFBGMNB8NIWBQ5II3BHJWKFW-LBZPYKXL326A-NVCHKQMX/EXEC';
 
   function submitRSVP() {
     const prenom = document.getElementById('rsvp-prenom').value.trim();
@@ -1014,7 +1006,7 @@
 
     const payload = { prenom, nom, telephone: tel, affiliation };
 
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec') {
+    if (APPS_SCRIPT_URL === 'HTTPS://SCRIPT.GOOGLE.COM/MACROS/S/AKFYCBWMDMJTR2HV-WCKDDC1HGOFBGMNB8NIWBQ5II3BHJWKFW-LBZPYKXL326A-NVCHKQMX/EXEC') {
       // Mode démo (sans backend configuré)
       setTimeout(() => {
         document.getElementById('rsvpForm').style.display = 'none';
