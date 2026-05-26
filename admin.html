@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M & E — Liste des invités</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8D5A3;
+    --emerald: #2D6A4F;
+    --cream: #FAF7F2;
+    --black: #0F0F0F;
+    --white: #FFFFFF;
+    --text-soft: #5a5047;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    min-height: 100svh;
+  }
+
+  /* LOGIN */
+  #loginPage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100svh;
+    padding: 2rem;
+  }
+  .login-box {
+    text-align: center;
+    max-width: 380px;
+    width: 100%;
+  }
+  .login-box .mono {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 4rem;
+    color: var(--gold);
+    font-weight: 300;
+    margin-bottom: 0.5rem;
+  }
+  .login-box h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 300;
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+  }
+  .login-box p {
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    margin-bottom: 2.5rem;
+  }
+  .login-box input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--white);
+    padding: 0.85rem 1.2rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    outline: none;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  .login-box input:focus { border-color: var(--gold); }
+  .login-btn {
+    width: 100%;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 0.85rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: opacity 0.3s;
+  }
+  .login-btn:hover { opacity: 0.85; }
+  .login-error {
+    margin-top: 0.75rem;
+    font-size: 0.75rem;
+    color: #e07070;
+    display: none;
+  }
+
+  /* DASHBOARD */
+  #dashboard { display: none; }
+
+  header {
+    background: rgba(15,15,15,0.95);
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 1.4rem;
+    font-weight: 300;
+  }
+  .header-title span { color: var(--gold); font-style: italic; }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .btn-refresh {
+    background: none;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    padding: 0.5rem 1rem;
+    font-family: 'Jost', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .btn-refresh:hover { background: rgba(201,168,76,0.1); }
+  .btn-logout {
+    background: none;
+    border: none;
+    color: rgba(255,255,255,0.3);
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .btn-logout:hover { color: var(--white); }
+
+  .stats-bar {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem 2rem;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(201,168,76,0.15);
+    padding: 1.2rem 1.5rem;
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+  }
+  .stat-card .num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 2.5rem;
+    color: var(--gold);
+    font-weight: 300;
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-card .lbl {
+    font-size: 0.6rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+  }
+  .stat-card.green .num { color: #52b788; }
+  .stat-card.blue .num { color: #7bb6e8; }
+
+  .section-label {
+    padding: 0.5rem 2rem 1rem;
+    font-size: 0.62rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+  }
+
+  .table-wrap {
+    overflow-x: auto;
+    padding: 0 1rem 3rem;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 560px;
+  }
+  thead tr {
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+  }
+  th {
+    font-size: 0.6rem;
+    letter-spacing: 0.35em;
+    text-transform: uppercase;
+    color: var(--gold);
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 400;
+  }
+  td {
+    padding: 0.85rem 1rem;
+    font-size: 0.85rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    vertical-align: middle;
+  }
+  tbody tr:hover td { background: rgba(255,255,255,0.02); }
+  .badge {
+    display: inline-block;
+    padding: 0.2rem 0.6rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    border-radius: 1px;
+  }
+  .badge-mariee { background: rgba(82,183,136,0.15); color: #52b788; border: 1px solid rgba(82,183,136,0.3); }
+  .badge-marie  { background: rgba(123,182,232,0.15); color: #7bb6e8; border: 1px solid rgba(123,182,232,0.3); }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(255,255,255,0.3);
+  }
+  .empty-state .big { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; font-style: italic; margin-bottom: 0.5rem; }
+  .empty-state small { font-size: 0.75rem; letter-spacing: 0.2em; }
+
+  .loading {
+    text-align: center;
+    padding: 4rem;
+    color: var(--gold);
+    font-size: 0.7rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+  }
+  .config-warning {
+    background: rgba(224,112,112,0.1);
+    border: 1px solid rgba(224,112,112,0.3);
+    color: #e07070;
+    padding: 1rem 2rem;
+    margin: 0 1rem 1rem;
+    font-size: 0.8rem;
+    line-height: 1.7;
+  }
+  .config-warning code {
+    background: rgba(255,255,255,0.1);
+    padding: 0.1rem 0.4rem;
+    font-size: 0.75rem;
+  }
+  .csv-btn {
+    margin: 0 2rem 0.5rem;
+    display: inline-block;
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.3);
+    color: var(--gold);
+    padding: 0.5rem 1rem;
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: 'Jost', sans-serif;
+  }
+  .csv-btn:hover { background: rgba(201,168,76,0.2); }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginPage">
+  <div class="login-box">
+    <div class="mono">M & E</div>
+    <h1>Liste des invités</h1>
+    <p>Accès réservé aux mariés</p>
+    <input type="password" id="pwdInput" placeholder="Mot de passe" onkeydown="if(event.key==='Enter') login()">
+    <button class="login-btn" onclick="login()">Accéder</button>
+    <p class="login-error" id="loginError">Mot de passe incorrect.</p>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div class="header-title">M & E — <span>Invités</span></div>
+    <div class="header-actions">
+      <button class="btn-refresh" onclick="loadGuests()">↻ Actualiser</button>
+      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+    </div>
+  </header>
+
+  <div id="configWarning" class="config-warning" style="display:none">
+    ⚠️ Le backend Google Apps Script n'est pas encore configuré dans <code>index.html</code> et <code>admin.html</code>. Suivez les instructions du fichier <code>Code.gs</code> pour l'activer.
+  </div>
+
+  <div class="stats-bar">
+    <div class="stat-card">
+      <div class="num" id="statTotal">—</div>
+      <div class="lbl">Total invités</div>
+    </div>
+    <div class="stat-card green">
+      <div class="num" id="statMariee">—</div>
+      <div class="lbl">Côté Emmanuella</div>
+    </div>
+    <div class="stat-card blue">
+      <div class="num" id="statMarie">—</div>
+      <div class="lbl">Côté Metuschelah</div>
+    </div>
+  </div>
+
+  <button class="csv-btn" onclick="exportCSV()">⬇ Exporter en CSV</button>
+
+  <div class="section-label">Participants confirmés</div>
+
+  <div class="table-wrap">
+    <div id="tableContent" class="loading">Chargement…</div>
+  </div>
+</div>
+
+<script>
+  // ⚠️  Remplacer par votre URL Google Apps Script après déploiement
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec';
+  const ADMIN_PWD = 'ME2026';
+
+  let guestData = [];
+
+  function login() {
+    const pwd = document.getElementById('pwdInput').value;
+    if (pwd === ADMIN_PWD) {
+      document.getElementById('loginPage').style.display = 'none';
+      document.getElementById('dashboard').style.display = 'block';
+      if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec') {
+        document.getElementById('configWarning').style.display = 'block';
+        showDemo();
+      } else {
+        loadGuests();
+      }
+    } else {
+      document.getElementById('loginError').style.display = 'block';
+    }
+  }
+
+  function logout() {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    document.getElementById('pwdInput').value = '';
+  }
+
+  function loadGuests() {
+    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbwmdMJTR2hv-WcKddc1HgOfbgmnb8NiWbq5Ii3BhJwKFw-lBzpYKXL326a-NvChkqMX/exec') { showDemo(); return; }
+    document.getElementById('tableContent').innerHTML = '<div class="loading">Chargement…</div>';
+
+    const cbName = 'rsvpCb_' + Date.now();
+    window[cbName] = function(res) {
+      guestData = res.data || [];
+      renderTable(guestData);
+      delete window[cbName];
+      const s = document.getElementById('script_' + cbName);
+      if (s) s.remove();
+    };
+    const sc = document.createElement('script');
+    sc.id = 'script_' + cbName;
+    sc.src = `${APPS_SCRIPT_URL}?action=list&pwd=${ADMIN_PWD}&callback=${cbName}`;
+    sc.onerror = () => {
+      document.getElementById('tableContent').innerHTML = '<div class="empty-state"><p class="big">Erreur de chargement</p><small>Vérifiez l\'URL Apps Script et le déploiement.</small></div>';
+    };
+    document.head.appendChild(sc);
+  }
+
+  function showDemo() {
+    guestData = [
+      { 'Date': '01/06/2026, 14:30', 'Prénom': 'Aline', 'Nom': 'Kouassi', 'Téléphone': '+225 07 11 22 33', 'Affiliation': 'Côté mariée — Emmanuella' },
+      { 'Date': '02/06/2026, 09:15', 'Prénom': 'Koffi', 'Nom': 'Yao', 'Téléphone': '+225 05 44 55 66', 'Affiliation': 'Côté marié — Metuschelah' },
+      { 'Date': '03/06/2026, 16:00', 'Prénom': 'Marie', 'Nom': 'Diallo', 'Téléphone': '+225 07 77 88 99', 'Affiliation': 'Côté mariée — Emmanuella' },
+    ];
+    renderTable(guestData);
+  }
+
+  function renderTable(data) {
+    updateStats(data);
+    if (!data.length) {
+      document.getElementById('tableContent').innerHTML = '<div class="empty-state"><p class="big">Aucune confirmation pour l\'instant</p><small>Les invités qui remplissent le formulaire apparaîtront ici.</small></div>';
+      return;
+    }
+    let rows = data.map((g, i) => {
+      const isMariee = (g['Affiliation'] || '').includes('mariée');
+      const badge = isMariee
+        ? '<span class="badge badge-mariee">Emmanuella</span>'
+        : '<span class="badge badge-marie">Metuschelah</span>';
+      return `<tr>
+        <td>${i + 1}</td>
+        <td><strong>${g['Prénom'] || ''}</strong></td>
+        <td>${g['Nom'] || ''}</td>
+        <td>${g['Téléphone'] || ''}</td>
+        <td>${badge}</td>
+        <td style="color:rgba(255,255,255,0.3);font-size:0.75rem">${g['Date'] || ''}</td>
+      </tr>`;
+    }).join('');
+    document.getElementById('tableContent').innerHTML = `
+      <table>
+        <thead><tr>
+          <th>#</th><th>Prénom</th><th>Nom</th><th>Téléphone</th><th>Côté</th><th>Date</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+  }
+
+  function updateStats(data) {
+    const mariee = data.filter(g => (g['Affiliation'] || '').includes('mariée')).length;
+    const marie  = data.filter(g => (g['Affiliation'] || '').includes('marié —')).length;
+    document.getElementById('statTotal').textContent  = data.length;
+    document.getElementById('statMariee').textContent = mariee;
+    document.getElementById('statMarie').textContent  = marie;
+  }
+
+  function exportCSV() {
+    if (!guestData.length) { alert('Aucune donnée à exporter.'); return; }
+    const keys = ['Prénom','Nom','Téléphone','Affiliation','Date'];
+    const csv = [keys.join(';'), ...guestData.map(g => keys.map(k => '"' + (g[k] || '') + '"').join(';'))].join('\n');
+    const a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+    a.download = 'invites_ME_2026.csv';
+    a.click();
+  }
+</script>
+</body>
+</html>
