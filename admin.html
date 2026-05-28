@@ -237,20 +237,7 @@
     letter-spacing: 0.4em;
     text-transform: uppercase;
   }
-  .config-warning {
-    background: rgba(224,112,112,0.1);
-    border: 1px solid rgba(224,112,112,0.3);
-    color: #e07070;
-    padding: 1rem 2rem;
-    margin: 0 1rem 1rem;
-    font-size: 0.8rem;
-    line-height: 1.7;
-  }
-  .config-warning code {
-    background: rgba(255,255,255,0.1);
-    padding: 0.1rem 0.4rem;
-    font-size: 0.75rem;
-  }
+
   .csv-btn {
     margin: 0 2rem 0.5rem;
     display: inline-block;
@@ -276,8 +263,8 @@
     <div class="mono">M & E</div>
     <h1>Liste des invités</h1>
     <p>Accès réservé aux mariés</p>
-    <input type="password" id="pwdInput" placeholder="Mot de passe" onkeydown="if(event.key==='Enter') login()">
-    <button class="login-btn" onclick="login()">Accéder</button>
+    <input type="password" id="pwdInput" placeholder="Mot de passe" onkeydown="if(event.key==='Enter') window.login()">
+    <button class="login-btn" onclick="window.login()">Accéder</button>
     <p class="login-error" id="loginError">Mot de passe incorrect.</p>
   </div>
 </div>
@@ -287,14 +274,10 @@
   <header>
     <div class="header-title">M & E — <span>Invités</span></div>
     <div class="header-actions">
-      <button class="btn-refresh" onclick="loadGuests()">↻ Actualiser</button>
-      <button class="btn-logout" onclick="logout()">Déconnexion</button>
+      <button class="btn-refresh" onclick="window.loadGuests()">↻ Actualiser</button>
+      <button class="btn-logout" onclick="window.logout()">Déconnexion</button>
     </div>
   </header>
-
-  <div id="configWarning" class="config-warning" style="display:none">
-    ⚠️ Le backend Google Apps Script n'est pas encore configuré dans <code>index.html</code> et <code>admin.html</code>. Suivez les instructions du fichier <code>Code.gs</code> pour l'activer.
-  </div>
 
   <div class="stats-bar">
     <div class="stat-card">
@@ -311,7 +294,7 @@
     </div>
   </div>
 
-  <button class="csv-btn" onclick="exportCSV()">⬇ Exporter en CSV</button>
+  <button class="csv-btn" onclick="window.exportCSV()">⬇ Exporter en CSV</button>
 
   <div class="section-label">Participants confirmés</div>
 
@@ -320,85 +303,102 @@
   </div>
 </div>
 
-<script>
-  // ⚠️  Remplacer par votre URL Google Apps Script après déploiement
-  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec';
+<!-- FIREBASE ADMIN SCRIPT (Remplacement de Google Apps Script) -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  // Votre configuration Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyCKhqgIZo0LyVXg95unq0JiB0O5zavLPL0",
+    authDomain: "mariage-me.firebaseapp.com",
+    projectId: "mariage-me",
+    storageBucket: "mariage-me.firebasestorage.app",
+    messagingSenderId: "715831356337",
+    appId: "1:715831356337:web:d2f22b14fa6b5e9156eb90",
+    measurementId: "G-MMKRH4XK90"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
   const ADMIN_PWD = 'ME2026';
+  window.guestData = [];
 
-  let guestData = [];
-
-  function login() {
+  window.login = function() {
     const pwd = document.getElementById('pwdInput').value;
     if (pwd === ADMIN_PWD) {
       document.getElementById('loginPage').style.display = 'none';
       document.getElementById('dashboard').style.display = 'block';
-      if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec') {
-        document.getElementById('configWarning').style.display = 'block';
-        showDemo();
-      } else {
-        loadGuests();
-      }
+      window.loadGuests();
     } else {
       document.getElementById('loginError').style.display = 'block';
     }
-  }
+  };
 
-  function logout() {
+  window.logout = function() {
     document.getElementById('loginPage').style.display = 'flex';
     document.getElementById('dashboard').style.display = 'none';
     document.getElementById('pwdInput').value = '';
-  }
+    document.getElementById('loginError').style.display = 'none';
+  };
 
-  function loadGuests() {
-    if (APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyfkO-2Cb7_msAlVOcwXm40sXUorvJdVgdX765QhrGwEEjUzkKD1JpbOPS5FHtCUxGYIw/exec') { showDemo(); return; }
-    document.getElementById('tableContent').innerHTML = '<div class="loading">Chargement…</div>';
+  window.loadGuests = async function() {
+    const tableContent = document.getElementById('tableContent');
+    tableContent.innerHTML = '<div class="loading">Chargement de la base de données...</div>';
+    
+    try {
+      const q = query(collection(db, "invites"), orderBy("date", "desc"));
+      const querySnapshot = await getDocs(q);
+      
+      window.guestData = [];
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        let dateStr = '';
+        if (data.date) {
+          const d = data.date.toDate();
+          dateStr = d.toLocaleDateString('fr-FR') + ' à ' + d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+        }
+        
+        window.guestData.push({
+          'Prénom': data.prenom || '',
+          'Nom': data.nom || '',
+          'Téléphone': data.telephone || '',
+          'Affiliation': data.affiliation || '',
+          'Date': dateStr
+        });
+      });
+      
+      window.renderTable(window.guestData);
+    } catch(error) {
+      console.error("Erreur Firebase:", error);
+      tableContent.innerHTML = '<div class="empty-state"><p class="big">Erreur de connexion</p><small>Impossible de lire les données. Vérifiez Firestore.</small></div>';
+    }
+  };
 
-    const cbName = 'rsvpCb_' + Date.now();
-    window[cbName] = function(res) {
-      guestData = res.data || [];
-      renderTable(guestData);
-      delete window[cbName];
-      const s = document.getElementById('script_' + cbName);
-      if (s) s.remove();
-    };
-    const sc = document.createElement('script');
-    sc.id = 'script_' + cbName;
-    sc.src = `${APPS_SCRIPT_URL}?action=list&pwd=${ADMIN_PWD}&callback=${cbName}`;
-    sc.onerror = () => {
-      document.getElementById('tableContent').innerHTML = '<div class="empty-state"><p class="big">Erreur de chargement</p><small>Vérifiez l\'URL Apps Script et le déploiement.</small></div>';
-    };
-    document.head.appendChild(sc);
-  }
-
-  function showDemo() {
-    guestData = [
-      { 'Date': '01/06/2026, 14:30', 'Prénom': 'Aline', 'Nom': 'Kouassi', 'Téléphone': '+225 07 11 22 33', 'Affiliation': 'Côté mariée — Emmanuella' },
-      { 'Date': '02/06/2026, 09:15', 'Prénom': 'Koffi', 'Nom': 'Yao', 'Téléphone': '+225 05 44 55 66', 'Affiliation': 'Côté marié — Metuschelah' },
-      { 'Date': '03/06/2026, 16:00', 'Prénom': 'Marie', 'Nom': 'Diallo', 'Téléphone': '+225 07 77 88 99', 'Affiliation': 'Côté mariée — Emmanuella' },
-    ];
-    renderTable(guestData);
-  }
-
-  function renderTable(data) {
-    updateStats(data);
+  window.renderTable = function(data) {
+    window.updateStats(data);
     if (!data.length) {
-      document.getElementById('tableContent').innerHTML = '<div class="empty-state"><p class="big">Aucune confirmation pour l\'instant</p><small>Les invités qui remplissent le formulaire apparaîtront ici.</small></div>';
+      document.getElementById('tableContent').innerHTML = '<div class="empty-state"><p class="big">Aucune confirmation pour l\'instant</p><small>Les invités apparaîtront ici.</small></div>';
       return;
     }
+    
     let rows = data.map((g, i) => {
-      const isMariee = (g['Affiliation'] || '').includes('mariée');
+      const isMariee = (g['Affiliation'] || '').toLowerCase().includes('mariée') || (g['Affiliation'] || '').toLowerCase().includes('emmanuella');
       const badge = isMariee
         ? '<span class="badge badge-mariee">Emmanuella</span>'
         : '<span class="badge badge-marie">Metuschelah</span>';
+        
       return `<tr>
         <td>${i + 1}</td>
-        <td><strong>${g['Prénom'] || ''}</strong></td>
-        <td>${g['Nom'] || ''}</td>
-        <td>${g['Téléphone'] || ''}</td>
+        <td><strong>${g['Prénom']}</strong></td>
+        <td>${g['Nom'].toUpperCase()}</td>
+        <td>${g['Téléphone']}</td>
         <td>${badge}</td>
-        <td style="color:rgba(255,255,255,0.3);font-size:0.75rem">${g['Date'] || ''}</td>
+        <td style="color:rgba(255,255,255,0.3);font-size:0.75rem">${g['Date']}</td>
       </tr>`;
     }).join('');
+    
     document.getElementById('tableContent').innerHTML = `
       <table>
         <thead><tr>
@@ -406,25 +406,29 @@
         </tr></thead>
         <tbody>${rows}</tbody>
       </table>`;
-  }
+  };
 
-  function updateStats(data) {
-    const mariee = data.filter(g => (g['Affiliation'] || '').includes('mariée')).length;
-    const marie  = data.filter(g => (g['Affiliation'] || '').includes('marié —')).length;
+  window.updateStats = function(data) {
+    const mariee = data.filter(g => {
+      const aff = (g['Affiliation'] || '').toLowerCase();
+      return aff.includes('mariée') || aff.includes('emmanuella');
+    }).length;
+    const marie = data.length - mariee;
+    
     document.getElementById('statTotal').textContent  = data.length;
     document.getElementById('statMariee').textContent = mariee;
     document.getElementById('statMarie').textContent  = marie;
-  }
+  };
 
-  function exportCSV() {
-    if (!guestData.length) { alert('Aucune donnée à exporter.'); return; }
+  window.exportCSV = function() {
+    if (!window.guestData.length) { alert('Aucune donnée à exporter.'); return; }
     const keys = ['Prénom','Nom','Téléphone','Affiliation','Date'];
-    const csv = [keys.join(';'), ...guestData.map(g => keys.map(k => '"' + (g[k] || '') + '"').join(';'))].join('\n');
+    const csv = [keys.join(';'), ...window.guestData.map(g => keys.map(k => '"' + (g[k] || '') + '"').join(';'))].join('\n');
     const a = document.createElement('a');
     a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
-    a.download = 'invites_ME_2026.csv';
+    a.download = 'invites_Mariage_ME.csv';
     a.click();
-  }
+  };
 </script>
 </body>
 </html>
