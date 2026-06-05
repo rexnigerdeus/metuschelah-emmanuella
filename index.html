@@ -510,12 +510,13 @@
     height: 60px;
     border-radius: 50%;
     border: 2px solid rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
   .swatch-name {
     font-size: 0.62rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
-    color: var(--text-soft);
+    color: rgba(255,255,255,0.8);
   }
 
   /* RSVP */
@@ -740,14 +741,14 @@
   <div class="verse-card">
     <span class="verse-who">Lui</span>
     <!-- PETITE TOUCHE FLORALE DANS LA CARTE -->
-    <img src="fleur-1.png" alt="Fleurs" class="floral-decoration small">
+    <img src="fleur-1.jpeg" alt="Fleurs" class="floral-decoration small">
     <blockquote>"J'ai trouvé celle que mon cœur aime."</blockquote>
     <cite>Cantique des Cantiques 3:4</cite>
   </div>
   <div class="verse-card">
     <span class="verse-who">Elle</span>
     <!-- PETITE TOUCHE FLORALE DANS LA CARTE -->
-    <img src="fleur-3.png" alt="Fleurs" class="floral-decoration small">
+    <img src="fleur-3.jpeg" alt="Fleurs" class="floral-decoration small">
     <blockquote>"Mon bien-aimé est à moi, et je suis à lui."</blockquote>
     <cite>Cantique des Cantiques 2:16</cite>
   </div>
@@ -756,11 +757,12 @@
 <!-- COUNTDOWN -->
 <section id="countdown-section" class="section-wide fade-in">
   <span class="label">Le grand jour</span>
-  <h2>Patience & Prières</h2>
+  <h2>Patience &amp; Prières</h2>
   <div class="countdown-grid">
-    <div class="countdown-item"><span class="countdown-num">42</span><span class="countdown-label">Jours</span></div>
-    <div class="countdown-item"><span class="countdown-num">10</span><span class="countdown-label">Heures</span></div>
-    <div class="countdown-item"><span class="countdown-num">30</span><span class="countdown-label">Minutes</span></div>
+    <div class="countdown-item"><span class="countdown-num" id="cdDays">—</span><span class="countdown-label">Jours</span></div>
+    <div class="countdown-item"><span class="countdown-num" id="cdHours">—</span><span class="countdown-label">Heures</span></div>
+    <div class="countdown-item"><span class="countdown-num" id="cdMins">—</span><span class="countdown-label">Minutes</span></div>
+    <div class="countdown-item"><span class="countdown-num" id="cdSecs">—</span><span class="countdown-label">Secondes</span></div>
   </div>
 </section>
 
@@ -771,40 +773,53 @@
   
   <div class="event-block">
     <span class="event-type">Cérémonie Civile</span>
-    <h3 class="event-title">Mairie de Cocody</h3>
+    <h3 class="event-title">Hôtel Communal</h3>
     <div class="event-detail">
       <span class="day">Jeudi 09 Juillet 2026</span>
-      <span class="time">14h00</span>
+      <span class="time">11h00</span>
     </div>
-    <p class="event-place"><strong>Abidjan, Cocody</strong><br>Hôtel de ville</p>
+    <p class="event-place"><strong>Mairie</strong><br>Hôtel Communal</p>
   </div>
   <div class="event-block">
     <span class="event-type">Bénédiction Nuptiale</span>
-    <h3 class="event-title">Église ...</h3>
+    <h3 class="event-title">Temple les Oliviers</h3>
     <div class="event-detail">
       <span class="day">Samedi 11 Juillet 2026</span>
-      <span class="time">10h00</span>
+      <span class="time">14h00</span>
     </div>
-    <p class="event-place"><strong>Abidjan</strong><br>Adresse de l'église</p>
+    <p class="event-place"><strong>Église Évangélique</strong><br>Assemblées de la Palmeraie — Temple les Oliviers</p>
+  </div>
+  <div class="event-block">
+    <span class="event-type">Soirée Dînatoire</span>
+    <h3 class="event-title">Royal Palace</h3>
+    <div class="event-detail">
+      <span class="day">Samedi 11 Juillet 2026</span>
+      <span class="time">17h00</span>
+    </div>
+    <p class="event-place"><strong>Réception</strong><br>Espace Événement Royal Palace</p>
   </div>
 </section>
 
 <!-- GREEN BLOCK -->
 <section class="emerald-block section-wide fade-in">
   <span class="label">Dress Code</span>
-  <p>Pour l'harmonie de cette belle journée, nous vous invitons à respecter ces couleurs.</p>
+  <p>Pour l'harmonie de cette belle journée, nous vous invitons à honorer ces couleurs.</p>
   <div class="dress-colors">
     <div class="dress-swatch">
-      <div class="swatch-circle" style="background: #C9A84C;"></div>
-      <span class="swatch-name">Or</span>
+      <div class="swatch-circle" style="background: #F8F5EF; border: 2px solid rgba(255,255,255,0.5);"></div>
+      <span class="swatch-name">Blanc</span>
+    </div>
+    <div class="dress-swatch">
+      <div class="swatch-circle" style="background: #111111;"></div>
+      <span class="swatch-name">Noir</span>
     </div>
     <div class="dress-swatch">
       <div class="swatch-circle" style="background: #2D6A4F;"></div>
-      <span class="swatch-name">Émeraude</span>
+      <span class="swatch-name">Vert Émeraude</span>
     </div>
     <div class="dress-swatch">
-      <div class="swatch-circle" style="background: #FAF7F2;"></div>
-      <span class="swatch-name">Crème</span>
+      <div class="swatch-circle" style="background: #C9A84C;"></div>
+      <span class="swatch-name">Or</span>
     </div>
   </div>
 </section>
@@ -891,7 +906,40 @@
   faders.forEach(fader => { appearOnScroll.observe(fader); });
 </script>
 
-<!-- Script Firebase Firestore pour le RSVP -->
+<!-- Countdown Live -->
+<script>
+  (function() {
+    const target = new Date('2026-07-09T11:00:00').getTime();
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function tick() {
+      const now = Date.now();
+      const diff = target - now;
+      if (diff <= 0) {
+        ['cdDays','cdHours','cdMins','cdSecs'].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.textContent = '00';
+        });
+        return;
+      }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      const days = document.getElementById('cdDays');
+      const hours = document.getElementById('cdHours');
+      const mins = document.getElementById('cdMins');
+      const secs = document.getElementById('cdSecs');
+      if (days) days.textContent = d;
+      if (hours) hours.textContent = pad(h);
+      if (mins) mins.textContent = pad(m);
+      if (secs) secs.textContent = pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+</script>
+
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
